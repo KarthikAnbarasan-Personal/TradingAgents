@@ -180,6 +180,48 @@ An interface will appear showing results as they load, letting you track the age
   <img src="assets/cli/cli_transaction.png" width="100%" style="display: inline-block; margin: 0 2%;">
 </p>
 
+### Local Web App (Next.js + FastAPI)
+
+You can run TradingAgents with a fully local web dashboard (no remote server deployment).
+
+1) Install Python dependencies:
+```bash
+pip install .
+```
+
+2) Start backend API:
+```bash
+uvicorn web_backend.app:app --host 0.0.0.0 --port 8000 --reload
+```
+
+3) Start frontend:
+```bash
+cd web-ui
+npm install
+npm run dev
+```
+
+4) Open:
+```text
+http://localhost:3000
+```
+
+Default frontend API target is `http://localhost:8000`. Override with:
+```bash
+NEXT_PUBLIC_TRADING_API_URL=http://localhost:8000
+```
+
+Core local API endpoints:
+- `GET /api/options` frontend dropdown/options contract
+- `POST /api/runs` create run
+- `GET /api/runs` list runs
+- `GET /api/runs/{id}` run snapshot
+- `GET /api/runs/{id}/events` live SSE stream
+- `POST /api/runs/{id}/cancel` cancel run
+- `GET /api/runs/{id}/report` final report payload
+- `GET /api/reports` list historical reports from `reports/`
+- `GET /api/reports/{report_id}` read a saved report bundle
+
 ## TradingAgents Package
 
 ### Implementation Details
