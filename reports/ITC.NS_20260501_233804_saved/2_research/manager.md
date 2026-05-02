@@ -1,0 +1,10 @@
+**Recommendation**: Overweight
+
+**Rationale**: ITC.NS has the stronger near-to-intermediate setup: price (~₹314.9) is back above the 10EMA/50SMA (~₹307) with MACD positive and RSI ~61, suggesting momentum has shifted in favor of buyers. Fundamentals support a defensive compounder profile (high profitability, stable recent net income band, low leverage signal in the provided snapshot) and the ~4.6% dividend yield provides carry while waiting for upside. The bear case is valid on timing and regime: the stock is still ~14% below the 200SMA (~₹365) and is pressing the upper Bollinger band (~₹315.7), so chasing here risks a pullback and valuation (P/B ~5.6) leaves less room for disappointment. Net: the bull thesis wins on quality + improving trend, but implementation should be staged (buy dips / add on confirmation) rather than an aggressive one-shot add at the band.
+
+**Strategic Actions**: 1) Positioning: move to an Overweight in ITC.NS via a staged add—target +25–50% of your intended incremental size now only if you can buy below/near ₹312, and reserve the remainder for pullbacks.
+2) Preferred add levels (buy-the-dip): place bids in the ₹308–₹307 zone (10EMA/50SMA area). If filled, add the next tranche on a successful retest/close back above ₹310.
+3) Breakout add: if price closes above the Bollinger upper band (~₹315.7) and holds for 2 sessions, add a smaller tranche (because it’s extension risk), aiming for momentum continuation.
+4) Risk controls: use ATR (~₹5.7) to avoid tight stops. For the overall add, use a technical stop on a daily close below ₹300 (≈ 2.5 ATR below ~₹314) or, more conservatively, below ₹303 (≈ 2 ATR) if position size is larger.
+5) Upside management: first profit/trim zone into ₹330–₹335 (prior swing/round-number resistance area), and reassess exposure as price approaches the 200SMA zone (~₹365), where supply is likely. Keep a core for dividend carry unless the trend breaks (close below 50SMA for a week).
+6) If already overweight: do not add at ₹314–₹316; wait for ₹308–₹307 or for a clean hold above ₹316 with volume/confirmation.

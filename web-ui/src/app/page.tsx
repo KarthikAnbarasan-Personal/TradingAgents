@@ -5,7 +5,7 @@ import { ActivityPanel } from "../components/ActivityPanel";
 import { ReportViewer } from "../components/ReportViewer";
 import { RunForm } from "../components/RunForm";
 import { StatsBar } from "../components/StatsBar";
-import { WorkflowBoard } from "../components/WorkflowBoard";
+import { WorkflowMissionControl } from "../components/WorkflowMissionControl";
 import {
   cancelRun,
   createRun,
@@ -161,7 +161,7 @@ export default function HomePage() {
         </div>
       </aside>
 
-      <section className="dashboard-right" aria-label="Live run and reports">
+      <section className="dashboard-right dashboard-right--home" aria-label="Live run and reports">
         <header className="dashboard-right-header">
           <div>
             <h2>Live run &amp; reports</h2>
@@ -173,8 +173,8 @@ export default function HomePage() {
           </div>
           <StatsBar run={selectedRun} />
         </header>
-        <div className="dashboard-right-body">
-          <WorkflowBoard agentStatus={selectedRun?.agent_status ?? {}} />
+        <div className="dashboard-right-body dashboard-right-body--home">
+          <WorkflowMissionControl agentStatus={selectedRun?.agent_status ?? {}} />
           <ActivityPanel events={events} />
           {saveMessage && (
             <div className="card" style={{ borderColor: "#22c55e", color: "#bbf7d0", fontSize: 13 }}>

@@ -1,0 +1,9 @@
+**Rating**: Overweight
+
+**Executive Summary**: Move to an Overweight in ITC.NS, but implement via a staged add to avoid chasing while price is sitting at the upper Bollinger band (~₹315.7). Initiate only a starter tranche (≈25% of intended incremental size) on a dip toward ~₹312 or ideally ₹308–₹307 (10EMA/50SMA area), and add the remainder only after the dip zone is defended or after a confirmed hold above ~₹316 for 2 sessions. Use a hard risk stop on a daily close below ₹300 (tighter: ₹303 if sizing up), and plan to trim into ₹330–₹335 while reassessing as price approaches the 200SMA supply zone (~₹365).
+
+**Investment Thesis**: The debate converges on a constructive near-to-intermediate setup: price (~₹314.9) has reclaimed the 10EMA/50SMA (~₹307) with MACD positive (~+1.62) and histogram positive (~+1.76) while RSI (~61) is bullish but not in classic exhaustion, supporting the Aggressive/Trader view that momentum has turned and warrants participation. However, the Conservative/Neutral analysts highlight the key timing risk: price is effectively at the upper Bollinger band (~₹315.68), where mean reversion/consolidation is common even with RSI in the 55–60s, and the longer-term regime remains a headwind with price ~14% below the 200SMA (~₹365), implying overhead supply and a higher chance of pullbacks. Therefore, the portfolio decision matches the Research Manager’s Overweight recommendation but implements it conditionally—small starter exposure now/dips, size up only on evidence the ₹308–₹307 structure is defended or on a confirmed breakout hold—while using ATR-aware stops (ATR ~₹5.7) to avoid getting shaken out by normal noise. Dividend carry (~4.6%) and defensive profile support holding a core if the trend remains intact, but valuation/extension risk argues against a one-shot aggressive add near the volatility envelope.
+
+**Price Target**: 335.0
+
+**Time Horizon**: 3-6 months
