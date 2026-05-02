@@ -39,8 +39,8 @@ export function ActivityPanel({ events }: Props) {
   }, [display.length, display[display.length - 1]?.seq]);
 
   return (
-    <div className="card">
-      <h3 className="section-title">Live Activity</h3>
+    <div className="card activity-panel-card">
+      <h3 className="section-title activity-panel-card-title">Live Activity</h3>
       <p className="muted" style={{ margin: "0 0 10px" }}>
         Streamed events (newest at bottom). Large tool outputs are truncated in the log.
       </p>
