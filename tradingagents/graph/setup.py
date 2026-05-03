@@ -5,6 +5,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.prebuilt import ToolNode
 
 from tradingagents.agents import *
+from tradingagents.agents.registry import ANALYST_KEY_TO_ID
 from tradingagents.agents.utils.agent_states import AgentState
 
 from .conditional_logic import ConditionalLogic
@@ -89,32 +90,32 @@ class GraphSetup:
         # Create workflow
         workflow = StateGraph(AgentState)
 
-        # Add analyst nodes to the graph
+        # Add analyst nodes to the graph (canonical ids = LangGraph node names)
         for analyst_type, node in analyst_nodes.items():
-            workflow.add_node(f"{analyst_type.capitalize()} Analyst", node)
+            node_id = ANALYST_KEY_TO_ID[analyst_type]
+            workflow.add_node(node_id, node)
             workflow.add_node(
                 f"Msg Clear {analyst_type.capitalize()}", delete_nodes[analyst_type]
             )
             workflow.add_node(f"tools_{analyst_type}", tool_nodes[analyst_type])
 
-        # Add other nodes
-        workflow.add_node("Bull Researcher", bull_researcher_node)
-        workflow.add_node("Bear Researcher", bear_researcher_node)
-        workflow.add_node("Research Manager", research_manager_node)
-        workflow.add_node("Trader", trader_node)
-        workflow.add_node("Aggressive Analyst", aggressive_analyst)
-        workflow.add_node("Neutral Analyst", neutral_analyst)
-        workflow.add_node("Conservative Analyst", conservative_analyst)
-        workflow.add_node("Portfolio Manager", portfolio_manager_node)
+        # Add other nodes (canonical ids)
+        workflow.add_node("ayan", bull_researcher_node)
+        workflow.add_node("kiran", bear_researcher_node)
+        workflow.add_node("tara", research_manager_node)
+        workflow.add_node("zian", trader_node)
+        workflow.add_node("veer", aggressive_analyst)
+        workflow.add_node("rey", neutral_analyst)
+        workflow.add_node("shan", conservative_analyst)
+        workflow.add_node("ira", portfolio_manager_node)
 
         # Define edges
-        # Start with the first analyst
-        first_analyst = selected_analysts[0]
-        workflow.add_edge(START, f"{first_analyst.capitalize()} Analyst")
+        first_id = ANALYST_KEY_TO_ID[selected_analysts[0]]
+        workflow.add_edge(START, first_id)
 
         # Connect analysts in sequence
         for i, analyst_type in enumerate(selected_analysts):
-            current_analyst = f"{analyst_type.capitalize()} Analyst"
+            current_analyst = ANALYST_KEY_TO_ID[analyst_type]
             current_tools = f"tools_{analyst_type}"
             current_clear = f"Msg Clear {analyst_type.capitalize()}"
 
@@ -126,57 +127,55 @@ class GraphSetup:
             )
             workflow.add_edge(current_tools, current_analyst)
 
-            # Connect to next analyst or to Bull Researcher if this is the last analyst
             if i < len(selected_analysts) - 1:
-                next_analyst = f"{selected_analysts[i+1].capitalize()} Analyst"
-                workflow.add_edge(current_clear, next_analyst)
+                next_id = ANALYST_KEY_TO_ID[selected_analysts[i + 1]]
+                workflow.add_edge(current_clear, next_id)
             else:
-                workflow.add_edge(current_clear, "Bull Researcher")
+                workflow.add_edge(current_clear, "ayan")
 
-        # Add remaining edges
         workflow.add_conditional_edges(
-            "Bull Researcher",
+            "ayan",
             self.conditional_logic.should_continue_debate,
             {
-                "Bear Researcher": "Bear Researcher",
-                "Research Manager": "Research Manager",
+                "kiran": "kiran",
+                "tara": "tara",
             },
         )
         workflow.add_conditional_edges(
-            "Bear Researcher",
+            "kiran",
             self.conditional_logic.should_continue_debate,
             {
-                "Bull Researcher": "Bull Researcher",
-                "Research Manager": "Research Manager",
+                "ayan": "ayan",
+                "tara": "tara",
             },
         )
-        workflow.add_edge("Research Manager", "Trader")
-        workflow.add_edge("Trader", "Aggressive Analyst")
+        workflow.add_edge("tara", "zian")
+        workflow.add_edge("zian", "veer")
         workflow.add_conditional_edges(
-            "Aggressive Analyst",
+            "veer",
             self.conditional_logic.should_continue_risk_analysis,
             {
-                "Conservative Analyst": "Conservative Analyst",
-                "Portfolio Manager": "Portfolio Manager",
-            },
-        )
-        workflow.add_conditional_edges(
-            "Conservative Analyst",
-            self.conditional_logic.should_continue_risk_analysis,
-            {
-                "Neutral Analyst": "Neutral Analyst",
-                "Portfolio Manager": "Portfolio Manager",
+                "shan": "shan",
+                "ira": "ira",
             },
         )
         workflow.add_conditional_edges(
-            "Neutral Analyst",
+            "shan",
             self.conditional_logic.should_continue_risk_analysis,
             {
-                "Aggressive Analyst": "Aggressive Analyst",
-                "Portfolio Manager": "Portfolio Manager",
+                "rey": "rey",
+                "ira": "ira",
+            },
+        )
+        workflow.add_conditional_edges(
+            "rey",
+            self.conditional_logic.should_continue_risk_analysis,
+            {
+                "veer": "veer",
+                "ira": "ira",
             },
         )
 
-        workflow.add_edge("Portfolio Manager", END)
+        workflow.add_edge("ira", END)
 
         return workflow

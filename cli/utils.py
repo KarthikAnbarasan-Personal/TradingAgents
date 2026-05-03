@@ -4,17 +4,23 @@ from typing import List, Optional, Tuple, Dict
 from rich.console import Console
 
 from cli.models import AnalystType
+from tradingagents.agents.registry import ANALYST_KEY_TO_ID, ANALYST_ORDER as ANALYST_KEYS_ORDER, display_name
 from tradingagents.llm_clients.model_catalog import get_model_options
 
 console = Console()
 
 TICKER_INPUT_EXAMPLES = "Examples: SPY, CNC.TO, 7203.T, 0700.HK"
 
+_ANALYST_KEY_TO_TYPE = {
+    "market": AnalystType.MARKET,
+    "social": AnalystType.SOCIAL,
+    "news": AnalystType.NEWS,
+    "fundamentals": AnalystType.FUNDAMENTALS,
+}
+
 ANALYST_ORDER = [
-    ("Market Analyst", AnalystType.MARKET),
-    ("Social Media Analyst", AnalystType.SOCIAL),
-    ("News Analyst", AnalystType.NEWS),
-    ("Fundamentals Analyst", AnalystType.FUNDAMENTALS),
+    (display_name(ANALYST_KEY_TO_ID[key]), _ANALYST_KEY_TO_TYPE[key])
+    for key in ANALYST_KEYS_ORDER
 ]
 
 

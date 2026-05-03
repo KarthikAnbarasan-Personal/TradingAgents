@@ -1,0 +1,9 @@
+**Recommendation**: Hold
+
+**Rationale**: TCS.NS remains a high-quality, cash-generative franchise (strong ROE/ROA, ~25% operating margin, robust FCF; forward EPS implies growth and forward P/E ~15 is not demanding). However, the debate’s strongest constraint is the market regime: price is below both the 50DMA (~2525) and far below the 200DMA (~2925), with MACD histogram still negative and RSI only mid-40s. That combination argues fundamentals are intact but timing/positioning risk is elevated and multiple compression can persist without a catalyst. Net: quality supports owning, but the unresolved downtrend argues against adding aggressively until a technical confirmation (reclaim/hold above ~2525 with improving momentum).
+
+**Strategic Actions**: 1) Maintain core exposure in TCS.NS; do not add meaningfully while price is below ~2525 (50DMA zone).
+2) Add-on trigger: initiate/scale in tranches only after a daily close above ~2525 followed by 2–3 sessions holding above it, ideally with MACD histogram improving toward/above 0.
+3) Risk controls for any new adds: initial stop ~1 ATR (~64) below entry (or below recent swing low, whichever is tighter), and reduce size if ATR expands.
+4) If price loses the recent base and closes below ~2380 (lower Bollinger vicinity) on rising volatility, trim 25–50% to manage drawdown risk.
+5) Upside management: first target is a mean-reversion move toward ~2600–2650; reassess for further adds only if the stock starts closing higher highs and the 50DMA turns up. For longer-term investors, use a staged accumulation plan (e.g., 25% now/75% only on confirmation) rather than lump-sum buying into the downtrend.

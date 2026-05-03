@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { formatSectionFileLabel, groupSectionPaths } from "../lib/reportSections";
+import { formatSectionNavDisplayLabel, groupSectionPaths, reorderSectionGroupsForNav } from "../lib/reportSections";
 import { RunReport } from "../lib/types";
 import { ResearchPaperProse } from "./ResearchPaperProse";
 
@@ -32,7 +32,7 @@ type Props = {
 
 export function ReportSplitViewer({ report }: Props) {
   const sectionGroups = useMemo(
-    () => groupSectionPaths(Object.keys(report?.sections ?? {})),
+    () => reorderSectionGroupsForNav(groupSectionPaths(Object.keys(report?.sections ?? {}))),
     [report?.sections]
   );
 
@@ -100,8 +100,7 @@ export function ReportSplitViewer({ report }: Props) {
                         onClick={() => setActiveKey(key)}
                       >
                         <span className="report-split-nav-item-text">
-                          <span className="report-split-nav-item-label">{formatSectionFileLabel(key)}</span>
-                          <span className="report-split-nav-item-hint mono">{key}</span>
+                          <span className="report-split-nav-item-label">{formatSectionNavDisplayLabel(key)}</span>
                         </span>
                       </button>
                     </li>

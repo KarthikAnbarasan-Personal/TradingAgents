@@ -1,4 +1,4 @@
 {
-  "/page": "app/page.js",
+  "/trading-floor/page": "app/trading-floor/page.js",
   "/history/page": "app/history/page.js"
 }

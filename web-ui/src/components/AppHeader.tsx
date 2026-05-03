@@ -25,6 +25,12 @@ export function AppHeader() {
           <Link href="/" className={pathname === "/" ? "active" : undefined}>
             Home
           </Link>
+          <Link href="/trading-floor" className={pathname === "/trading-floor" ? "active" : undefined}>
+            Trading Floor
+          </Link>
+          <Link href="/team" className={pathname === "/team" ? "active" : undefined}>
+            Team
+          </Link>
           <Link href="/history" className={pathname === "/history" ? "active" : undefined}>
             Run history
           </Link>

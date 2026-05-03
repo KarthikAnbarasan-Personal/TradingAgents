@@ -15,7 +15,7 @@ from tradingagents.agents.utils.structured import (
 
 
 def create_trader(llm):
-    structured_llm = bind_structured(llm, TraderProposal, "Trader")
+    structured_llm = bind_structured(llm, TraderProposal, "Zian")
 
     def trader_node(state, name):
         company_name = state["company_of_interest"]
@@ -49,7 +49,7 @@ def create_trader(llm):
             llm,
             messages,
             render_trader_proposal,
-            "Trader",
+            "Zian",
         )
 
         return {
@@ -58,4 +58,4 @@ def create_trader(llm):
             "sender": name,
         }
 
-    return functools.partial(trader_node, name="Trader")
+    return functools.partial(trader_node, name="zian")

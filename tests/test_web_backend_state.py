@@ -6,14 +6,13 @@ def test_update_analyst_status_transitions():
     state.init_for_analysis(["market", "news"])
 
     changed = update_analyst_statuses(state, {})
-    assert changed["Market Analyst"] == "in_progress"
-    assert state.agent_status["News Analyst"] == "pending"
+    assert changed["arin"] == "in_progress"
+    assert state.agent_status["rama"] == "pending"
 
     changed = update_analyst_statuses(state, {"market_report": "market content"})
-    assert state.agent_status["Market Analyst"] == "completed"
-    assert state.agent_status["News Analyst"] == "in_progress"
+    assert state.agent_status["arin"] == "completed"
+    assert state.agent_status["rama"] == "in_progress"
 
     changed = update_analyst_statuses(state, {"news_report": "news content"})
-    assert state.agent_status["News Analyst"] == "completed"
-    assert state.agent_status["Bull Researcher"] == "in_progress"
-
+    assert state.agent_status["rama"] == "completed"
+    assert state.agent_status["ayan"] == "in_progress"

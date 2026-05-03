@@ -5,6 +5,8 @@ import { RunSnapshot } from "../lib/types";
 
 type Props = {
   run: RunSnapshot | null;
+  /** Single horizontal row (trading floor HUD). Default: 5-column grid for home/history. */
+  layout?: "grid" | "inline";
 };
 
 function formatElapsed(run: RunSnapshot | null): string {
@@ -17,8 +19,38 @@ function formatElapsed(run: RunSnapshot | null): string {
   return `${m}m ${s}s`;
 }
 
-/** Shared grid of run metrics (used inline on Home and inside the history info dialog). */
-export function RunStatsFields({ run }: Props) {
+/** Shared run metrics (grid on Home/history dialog; single row on trading floor). */
+export function RunStatsFields({ run, layout = "grid" }: Props) {
+  if (layout === "inline") {
+    const tokIn = (run?.stats?.tokens_in ?? 0).toLocaleString();
+    const tokOut = (run?.stats?.tokens_out ?? 0).toLocaleString();
+    return (
+      <div className="run-stats-fields run-stats-fields--inline" role="group" aria-label="Run metrics">
+        <div className="run-stat-inline">
+          <span className="muted">Status</span>
+          <span className="mono">{run?.status ?? "—"}</span>
+        </div>
+        <div className="run-stat-inline">
+          <span className="muted">LLM</span>
+          <span className="mono">{run?.stats?.llm_calls ?? 0}</span>
+        </div>
+        <div className="run-stat-inline">
+          <span className="muted">Tools</span>
+          <span className="mono">{run?.stats?.tool_calls ?? 0}</span>
+        </div>
+        <div className="run-stat-inline">
+          <span className="muted">Tokens</span>
+          <span className="mono">
+            {tokIn}/{tokOut}
+          </span>
+        </div>
+        <div className="run-stat-inline">
+          <span className="muted">Elapsed</span>
+          <span className="mono">{formatElapsed(run)}</span>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="run-stats-fields"

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { ANALYST_SELECT_OPTIONS } from "../lib/agentRegistry";
 import { FrontendOptions, RunCreateRequest } from "../lib/types";
 
 type Props = {
@@ -55,12 +56,7 @@ export function RunForm({ options, onStart, disabled }: Props) {
     [ticker, analysisDate, analysts, llmProvider, resolvedDeepModel, resolvedQuickModel, researchDepth, outputLanguage, checkpointEnabled]
   );
 
-  const allAnalystOptions = options?.analysts ?? [
-    { key: "market", label: "Market Analyst" },
-    { key: "social", label: "Social Media Analyst" },
-    { key: "news", label: "News Analyst" },
-    { key: "fundamentals", label: "Fundamentals Analyst" }
-  ];
+  const allAnalystOptions = options?.analysts ?? ANALYST_SELECT_OPTIONS;
 
   return (
     <div className="card">

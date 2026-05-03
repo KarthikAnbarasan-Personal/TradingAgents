@@ -15,6 +15,7 @@ import {
   openRunEvents,
   saveRunReportCopy
 } from "../lib/api";
+import { resolveAgentId } from "../lib/agentRegistry";
 import { FrontendOptions, RunEvent, RunReport, RunSnapshot } from "../lib/types";
 
 export default function HomePage() {
@@ -63,7 +64,7 @@ export default function HomePage() {
               ...prev,
               agent_status: {
                 ...prev.agent_status,
-                [String(event.data.agent)]: String(event.data.status)
+                [resolveAgentId(String(event.data.agent))]: String(event.data.status)
               }
             };
           });

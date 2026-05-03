@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { agentDisplayName } from "../lib/agentRegistry";
 import { MISSION_BAYS, normalizeAgentStatus } from "../lib/workflowMissionLayout";
 
 type Props = {
@@ -96,7 +97,7 @@ export function WorkflowMissionControl({ agentStatus }: Props) {
                         key={agent}
                         className={`mc-station ${stationModClass(status)}`}
                         role="group"
-                        aria-label={`${agent}, ${status}`}
+                        aria-label={`${agentDisplayName(agent)}, ${status}`}
                       >
                         <div className="mc-station-bezel">
                           <div className="mc-station-screen-wrap">
@@ -104,7 +105,7 @@ export function WorkflowMissionControl({ agentStatus }: Props) {
                             <OperatorGlyph active={active} />
                           </div>
                           <div className="mc-station-meta">
-                            <div className="mc-station-name">{agent}</div>
+                            <div className="mc-station-name">{agentDisplayName(agent)}</div>
                             <div className="mc-station-footer">
                               <span className={`mc-led ${statusLedClass(status)}`} aria-hidden />
                               <span className="mono mc-station-status">{status.replace(/_/g, " ")}</span>

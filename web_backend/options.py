@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+from tradingagents.agents.registry import ANALYST_KEY_TO_ID, ANALYST_ORDER, display_name
 from tradingagents.llm_clients.model_catalog import get_model_options
 
 
@@ -74,10 +75,7 @@ def build_frontend_options() -> Dict[str, Any]:
         "output_languages": OUTPUT_LANGUAGES,
         "models": models,
         "analysts": [
-            {"key": "market", "label": "Market Analyst"},
-            {"key": "social", "label": "Social Media Analyst"},
-            {"key": "news", "label": "News Analyst"},
-            {"key": "fundamentals", "label": "Fundamentals Analyst"},
+            {"key": k, "label": display_name(ANALYST_KEY_TO_ID[k])} for k in ANALYST_ORDER
         ],
     }
 

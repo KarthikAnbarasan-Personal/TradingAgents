@@ -4,14 +4,12 @@ import ast
 from collections import deque
 from typing import Dict, Iterable, Optional, Tuple
 
+from tradingagents.agents.registry import (
+    ANALYST_KEY_TO_ID,
+    ANALYST_ORDER,
+    FIXED_AGENT_GROUPS,
+)
 
-ANALYST_ORDER = ["market", "social", "news", "fundamentals"]
-ANALYST_AGENT_NAMES = {
-    "market": "Market Analyst",
-    "social": "Social Analyst",
-    "news": "News Analyst",
-    "fundamentals": "Fundamentals Analyst",
-}
 ANALYST_REPORT_MAP = {
     "market": "market_report",
     "social": "sentiment_report",
@@ -21,21 +19,16 @@ ANALYST_REPORT_MAP = {
 
 
 class WorkflowState:
-    FIXED_AGENTS = {
-        "Research Team": ["Bull Researcher", "Bear Researcher", "Research Manager"],
-        "Trading Team": ["Trader"],
-        "Risk Management": ["Aggressive Analyst", "Neutral Analyst", "Conservative Analyst"],
-        "Portfolio Management": ["Portfolio Manager"],
-    }
-    ANALYST_MAPPING = ANALYST_AGENT_NAMES
+    FIXED_AGENTS = {k: list(v) for k, v in FIXED_AGENT_GROUPS.items()}
+    ANALYST_MAPPING = dict(ANALYST_KEY_TO_ID)
     REPORT_SECTIONS = {
-        "market_report": ("market", "Market Analyst"),
-        "sentiment_report": ("social", "Social Analyst"),
-        "news_report": ("news", "News Analyst"),
-        "fundamentals_report": ("fundamentals", "Fundamentals Analyst"),
-        "investment_plan": (None, "Research Manager"),
-        "trader_investment_plan": (None, "Trader"),
-        "final_trade_decision": (None, "Portfolio Manager"),
+        "market_report": ("market", "arin"),
+        "sentiment_report": ("social", "mira"),
+        "news_report": ("news", "rama"),
+        "fundamentals_report": ("fundamentals", "neel"),
+        "investment_plan": (None, "tara"),
+        "trader_investment_plan": (None, "zian"),
+        "final_trade_decision": (None, "ira"),
     }
 
     def __init__(self, max_length: int = 300) -> None:
@@ -88,27 +81,27 @@ def update_analyst_statuses(state: WorkflowState, chunk: Dict) -> Dict[str, str]
         if analyst_key not in selected:
             continue
 
-        agent_name = ANALYST_AGENT_NAMES[analyst_key]
+        agent_id = ANALYST_KEY_TO_ID[analyst_key]
         report_key = ANALYST_REPORT_MAP[analyst_key]
         if chunk.get(report_key):
             state.update_report_section(report_key, chunk[report_key])
 
         has_report = bool(state.report_sections.get(report_key))
         if has_report:
-            if state.update_agent_status(agent_name, "completed"):
-                changed[agent_name] = "completed"
+            if state.update_agent_status(agent_id, "completed"):
+                changed[agent_id] = "completed"
         elif not found_active:
-            if state.update_agent_status(agent_name, "in_progress"):
-                changed[agent_name] = "in_progress"
+            if state.update_agent_status(agent_id, "in_progress"):
+                changed[agent_id] = "in_progress"
             found_active = True
         else:
-            if state.update_agent_status(agent_name, "pending"):
-                changed[agent_name] = "pending"
+            if state.update_agent_status(agent_id, "pending"):
+                changed[agent_id] = "pending"
 
     if not found_active and selected:
-        if state.agent_status.get("Bull Researcher") == "pending":
-            if state.update_agent_status("Bull Researcher", "in_progress"):
-                changed["Bull Researcher"] = "in_progress"
+        if state.agent_status.get("ayan") == "pending":
+            if state.update_agent_status("ayan", "in_progress"):
+                changed["ayan"] = "in_progress"
 
     return changed
 
@@ -159,4 +152,3 @@ def classify_message_type(message) -> Tuple[str, Optional[str]]:
     if isinstance(message, AIMessage):
         return ("Agent", content)
     return ("System", content)
-

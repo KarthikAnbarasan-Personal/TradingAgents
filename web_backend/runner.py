@@ -13,12 +13,9 @@ from tradingagents.graph.trading_graph import TradingAgentsGraph
 
 from web_backend.run_manager import RunManager
 from web_backend.schemas import RunCreateRequest
-from web_backend.state import (
-    ANALYST_ORDER,
-    WorkflowState,
-    classify_message_type,
-    update_analyst_statuses,
-)
+from tradingagents.agents.registry import ANALYST_KEY_TO_ID, ANALYST_ORDER, display_name, report_heading
+
+from web_backend.state import WorkflowState, classify_message_type, update_analyst_statuses
 
 
 def _copy_jsonable(value: Any) -> Any:
@@ -49,19 +46,19 @@ def _save_report_to_disk(final_state: Dict[str, Any], ticker: str, save_path: Pa
     if final_state.get("market_report"):
         analysts_dir.mkdir(exist_ok=True)
         (analysts_dir / "market.md").write_text(final_state["market_report"], encoding="utf-8")
-        analyst_parts.append(("Market Analyst", final_state["market_report"]))
+        analyst_parts.append((display_name("arin"), final_state["market_report"]))
     if final_state.get("sentiment_report"):
         analysts_dir.mkdir(exist_ok=True)
         (analysts_dir / "sentiment.md").write_text(final_state["sentiment_report"], encoding="utf-8")
-        analyst_parts.append(("Social Analyst", final_state["sentiment_report"]))
+        analyst_parts.append((display_name("mira"), final_state["sentiment_report"]))
     if final_state.get("news_report"):
         analysts_dir.mkdir(exist_ok=True)
         (analysts_dir / "news.md").write_text(final_state["news_report"], encoding="utf-8")
-        analyst_parts.append(("News Analyst", final_state["news_report"]))
+        analyst_parts.append((display_name("rama"), final_state["news_report"]))
     if final_state.get("fundamentals_report"):
         analysts_dir.mkdir(exist_ok=True)
         (analysts_dir / "fundamentals.md").write_text(final_state["fundamentals_report"], encoding="utf-8")
-        analyst_parts.append(("Fundamentals Analyst", final_state["fundamentals_report"]))
+        analyst_parts.append((display_name("neel"), final_state["fundamentals_report"]))
     if analyst_parts:
         content = "\n\n".join(f"### {name}\n{text}" for name, text in analyst_parts)
         sections.append(f"## I. Analyst Team Reports\n\n{content}")
@@ -73,15 +70,15 @@ def _save_report_to_disk(final_state: Dict[str, Any], ticker: str, save_path: Pa
         if debate.get("bull_history"):
             research_dir.mkdir(exist_ok=True)
             (research_dir / "bull.md").write_text(debate["bull_history"], encoding="utf-8")
-            research_parts.append(("Bull Researcher", debate["bull_history"]))
+            research_parts.append((display_name("ayan"), debate["bull_history"]))
         if debate.get("bear_history"):
             research_dir.mkdir(exist_ok=True)
             (research_dir / "bear.md").write_text(debate["bear_history"], encoding="utf-8")
-            research_parts.append(("Bear Researcher", debate["bear_history"]))
+            research_parts.append((display_name("kiran"), debate["bear_history"]))
         if debate.get("judge_decision"):
             research_dir.mkdir(exist_ok=True)
             (research_dir / "manager.md").write_text(debate["judge_decision"], encoding="utf-8")
-            research_parts.append(("Research Manager", debate["judge_decision"]))
+            research_parts.append((display_name("tara"), debate["judge_decision"]))
         if research_parts:
             content = "\n\n".join(f"### {name}\n{text}" for name, text in research_parts)
             sections.append(f"## II. Research Team Decision\n\n{content}")
@@ -90,7 +87,9 @@ def _save_report_to_disk(final_state: Dict[str, Any], ticker: str, save_path: Pa
         trading_dir = save_path / "3_trading"
         trading_dir.mkdir(exist_ok=True)
         (trading_dir / "trader.md").write_text(final_state["trader_investment_plan"], encoding="utf-8")
-        sections.append(f"## III. Trading Team Plan\n\n### Trader\n{final_state['trader_investment_plan']}")
+        sections.append(
+            f"## III. Trading Team Plan\n\n### {report_heading('zian')}\n{final_state['trader_investment_plan']}"
+        )
 
     if final_state.get("risk_debate_state"):
         risk_dir = save_path / "4_risk"
@@ -99,15 +98,15 @@ def _save_report_to_disk(final_state: Dict[str, Any], ticker: str, save_path: Pa
         if risk.get("aggressive_history"):
             risk_dir.mkdir(exist_ok=True)
             (risk_dir / "aggressive.md").write_text(risk["aggressive_history"], encoding="utf-8")
-            risk_parts.append(("Aggressive Analyst", risk["aggressive_history"]))
+            risk_parts.append((display_name("veer"), risk["aggressive_history"]))
         if risk.get("conservative_history"):
             risk_dir.mkdir(exist_ok=True)
             (risk_dir / "conservative.md").write_text(risk["conservative_history"], encoding="utf-8")
-            risk_parts.append(("Conservative Analyst", risk["conservative_history"]))
+            risk_parts.append((display_name("shan"), risk["conservative_history"]))
         if risk.get("neutral_history"):
             risk_dir.mkdir(exist_ok=True)
             (risk_dir / "neutral.md").write_text(risk["neutral_history"], encoding="utf-8")
-            risk_parts.append(("Neutral Analyst", risk["neutral_history"]))
+            risk_parts.append((display_name("rey"), risk["neutral_history"]))
         if risk_parts:
             content = "\n\n".join(f"### {name}\n{text}" for name, text in risk_parts)
             sections.append(f"## IV. Risk Management Team Decision\n\n{content}")
@@ -115,7 +114,9 @@ def _save_report_to_disk(final_state: Dict[str, Any], ticker: str, save_path: Pa
             portfolio_dir = save_path / "5_portfolio"
             portfolio_dir.mkdir(exist_ok=True)
             (portfolio_dir / "decision.md").write_text(risk["judge_decision"], encoding="utf-8")
-            sections.append(f"## V. Portfolio Manager Decision\n\n### Portfolio Manager\n{risk['judge_decision']}")
+            sections.append(
+                f"## V. Portfolio Decision\n\n### {report_heading('ira')}\n{risk['judge_decision']}"
+            )
 
     header = f"# Trading Analysis Report: {ticker}\n\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
     complete_report = save_path / "complete_report.md"
@@ -124,7 +125,7 @@ def _save_report_to_disk(final_state: Dict[str, Any], ticker: str, save_path: Pa
 
 
 def _update_research_team_status(state: WorkflowState, status: str) -> None:
-    for agent in ["Bull Researcher", "Bear Researcher", "Research Manager"]:
+    for agent in ("ayan", "kiran", "tara"):
         state.update_agent_status(agent, status)
 
 
@@ -202,10 +203,12 @@ def run_analysis_job(manager: RunManager, run_id: str) -> None:
         callbacks=[stats_handler],
     )
 
-    first_analyst = f"{selected_analyst_keys[0].capitalize()} Analyst" if selected_analyst_keys else None
-    if first_analyst and first_analyst in state.agent_status:
-        state.update_agent_status(first_analyst, "in_progress")
-        manager.append_event(run_id, "agent_status_changed", {"agent": first_analyst, "status": "in_progress"})
+    first_analyst_id = ANALYST_KEY_TO_ID[selected_analyst_keys[0]] if selected_analyst_keys else None
+    if first_analyst_id and first_analyst_id in state.agent_status:
+        state.update_agent_status(first_analyst_id, "in_progress")
+        manager.append_event(
+            run_id, "agent_status_changed", {"agent": first_analyst_id, "status": "in_progress"}
+        )
 
     trace: List[Dict[str, Any]] = []
     failed = False
@@ -268,19 +271,25 @@ def run_analysis_job(manager: RunManager, run_id: str) -> None:
                 if bull_hist or bear_hist:
                     _update_research_team_status(state, "in_progress")
                 if bull_hist:
-                    state.update_report_section("investment_plan", f"### Bull Researcher Analysis\n{bull_hist}")
+                    state.update_report_section(
+                        "investment_plan", f"### {report_heading('ayan')} — analysis\n{bull_hist}"
+                    )
                 if bear_hist:
-                    state.update_report_section("investment_plan", f"### Bear Researcher Analysis\n{bear_hist}")
+                    state.update_report_section(
+                        "investment_plan", f"### {report_heading('kiran')} — analysis\n{bear_hist}"
+                    )
                 if judge:
-                    state.update_report_section("investment_plan", f"### Research Manager Decision\n{judge}")
+                    state.update_report_section(
+                        "investment_plan", f"### {report_heading('tara')} — decision\n{judge}"
+                    )
                     _update_research_team_status(state, "completed")
-                    state.update_agent_status("Trader", "in_progress")
+                    state.update_agent_status("zian", "in_progress")
 
             if chunk.get("trader_investment_plan"):
                 state.update_report_section("trader_investment_plan", chunk["trader_investment_plan"])
-                if state.agent_status.get("Trader") != "completed":
-                    state.update_agent_status("Trader", "completed")
-                    state.update_agent_status("Aggressive Analyst", "in_progress")
+                if state.agent_status.get("zian") != "completed":
+                    state.update_agent_status("zian", "completed")
+                    state.update_agent_status("veer", "in_progress")
 
             if chunk.get("risk_debate_state"):
                 risk_state = chunk["risk_debate_state"]
@@ -289,25 +298,33 @@ def run_analysis_job(manager: RunManager, run_id: str) -> None:
                 neu_hist = risk_state.get("neutral_history", "").strip()
                 judge = risk_state.get("judge_decision", "").strip()
                 if agg_hist:
-                    if state.agent_status.get("Aggressive Analyst") != "completed":
-                        state.update_agent_status("Aggressive Analyst", "in_progress")
-                    state.update_report_section("final_trade_decision", f"### Aggressive Analyst Analysis\n{agg_hist}")
+                    if state.agent_status.get("veer") != "completed":
+                        state.update_agent_status("veer", "in_progress")
+                    state.update_report_section(
+                        "final_trade_decision", f"### {report_heading('veer')} — analysis\n{agg_hist}"
+                    )
                 if con_hist:
-                    if state.agent_status.get("Conservative Analyst") != "completed":
-                        state.update_agent_status("Conservative Analyst", "in_progress")
-                    state.update_report_section("final_trade_decision", f"### Conservative Analyst Analysis\n{con_hist}")
+                    if state.agent_status.get("shan") != "completed":
+                        state.update_agent_status("shan", "in_progress")
+                    state.update_report_section(
+                        "final_trade_decision", f"### {report_heading('shan')} — analysis\n{con_hist}"
+                    )
                 if neu_hist:
-                    if state.agent_status.get("Neutral Analyst") != "completed":
-                        state.update_agent_status("Neutral Analyst", "in_progress")
-                    state.update_report_section("final_trade_decision", f"### Neutral Analyst Analysis\n{neu_hist}")
+                    if state.agent_status.get("rey") != "completed":
+                        state.update_agent_status("rey", "in_progress")
+                    state.update_report_section(
+                        "final_trade_decision", f"### {report_heading('rey')} — analysis\n{neu_hist}"
+                    )
                 if judge:
-                    if state.agent_status.get("Portfolio Manager") != "completed":
-                        state.update_agent_status("Portfolio Manager", "in_progress")
-                        state.update_report_section("final_trade_decision", f"### Portfolio Manager Decision\n{judge}")
-                        state.update_agent_status("Aggressive Analyst", "completed")
-                        state.update_agent_status("Conservative Analyst", "completed")
-                        state.update_agent_status("Neutral Analyst", "completed")
-                        state.update_agent_status("Portfolio Manager", "completed")
+                    if state.agent_status.get("ira") != "completed":
+                        state.update_agent_status("ira", "in_progress")
+                        state.update_report_section(
+                            "final_trade_decision", f"### {report_heading('ira')} — decision\n{judge}"
+                        )
+                        state.update_agent_status("veer", "completed")
+                        state.update_agent_status("shan", "completed")
+                        state.update_agent_status("rey", "completed")
+                        state.update_agent_status("ira", "completed")
 
             _emit_agent_status_changes(manager, run_id, before_agents, state.agent_status)
             _emit_section_changes(manager, run_id, before_sections, state.report_sections)

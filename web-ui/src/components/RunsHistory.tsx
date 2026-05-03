@@ -44,7 +44,7 @@ export function RunsHistory({
       {runs.length === 0 ? (
         <div className="muted">No runs yet.</div>
       ) : (
-        <div style={listStyle}>
+        <div className="runs-history-scroll" style={listStyle}>
           {runs.map((run) => (
             <button
               key={run.run_id}
@@ -67,7 +67,7 @@ export function RunsHistory({
       {savedReports.length === 0 ? (
         <div className="muted">No saved reports in `reports/` yet.</div>
       ) : (
-        <div style={savedStyle}>
+        <div className="runs-history-scroll" style={savedStyle}>
           {savedReports.map((item) => (
             <button
               key={item.report_id}

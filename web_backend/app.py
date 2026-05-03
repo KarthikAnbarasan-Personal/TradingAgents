@@ -16,7 +16,7 @@ from web_backend.events import to_sse
 from web_backend.options import build_frontend_options
 from web_backend.run_manager import RunManager
 from web_backend.runner import start_run_thread
-from web_backend.schemas import RunCreateRequest
+from web_backend.schemas import RunCreateRequest, RunEvent
 
 
 load_dotenv()
@@ -129,6 +129,27 @@ def stream_events(run_id: str, last_seq: int = Query(0, ge=0)) -> StreamingRespo
             run_manager.unsubscribe(run_id, subscriber)
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@app.get("/api/runs/{run_id}/events/all")
+def get_all_persisted_events(run_id: str) -> list:
+    """Return all events from `runs/{run_id}/events.jsonl` for replay / trading floor."""
+    if run_manager.get_run(run_id) is None:
+        raise HTTPException(status_code=404, detail="Run not found")
+    event_path = RUNS_DIR / run_id / "events.jsonl"
+    if not event_path.is_file():
+        return []
+    out: list[dict] = []
+    for line in event_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            data = json.loads(line)
+            out.append(RunEvent.model_validate(data).model_dump(mode="json"))
+        except Exception:
+            continue
+    return out
 
 
 @app.get("/api/runs/{run_id}/report")
