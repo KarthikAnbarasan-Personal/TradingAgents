@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { ReportSplitViewer } from "../../components/ReportSplitViewer";
 import { RunsHistory } from "../../components/RunsHistory";
-import { RunStatsInfoButton } from "../../components/RunStatsInfoButton";
+import { RunStatsFields } from "../../components/StatsBar";
 import { cancelRun, getRun, getRunReport, getSavedReport, listRuns, listSavedReports } from "../../lib/api";
 import { RunReport, RunSnapshot, SavedReportListItem } from "../../lib/types";
 
@@ -141,11 +141,30 @@ export function HistoryPageClient() {
                 Choose a section in the report panel to render only that part, or open the complete report.
               </p>
             </div>
-            <RunStatsInfoButton run={selectedRun} />
+            <div className="history-report-stats">
+              <RunStatsFields run={selectedRun} layout="inline" />
+            </div>
           </div>
         </header>
         <div className="dashboard-right-body">
-          <ReportSplitViewer report={report} />
+          <ReportSplitViewer
+            report={report}
+            januTarget={
+              selectedRunId
+                ? { kind: "run", runId: selectedRunId }
+                : selectedSavedReportId
+                  ? { kind: "saved", reportId: selectedSavedReportId }
+                  : null
+            }
+            onAfterJanu={async () => {
+              if (selectedRunId) {
+                await loadRun(selectedRunId);
+              } else if (selectedSavedReportId) {
+                const loaded = await getSavedReport(selectedSavedReportId);
+                setReport(loaded);
+              }
+            }}
+          />
         </div>
       </section>
     </div>

@@ -48,7 +48,8 @@ class WorkflowState:
                 self.agent_status[self.ANALYST_MAPPING[analyst_key]] = "pending"
         for team_agents in self.FIXED_AGENTS.values():
             for agent in team_agents:
-                self.agent_status[agent] = "pending"
+                # Janu is on-demand only; keep off the main pending pipeline in the UI.
+                self.agent_status[agent] = "standby" if agent == "janu" else "pending"
         self.report_sections = {}
         for section, (analyst_key, _) in self.REPORT_SECTIONS.items():
             if analyst_key is None or analyst_key in selected:

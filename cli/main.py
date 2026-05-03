@@ -47,7 +47,7 @@ class MessageBuffer:
         "Research Team": ["ayan", "kiran", "tara"],
         "Trading Team": ["zian"],
         "Risk Management": ["veer", "shan", "rey"],
-        "Portfolio Management": ["ira"],
+        "Portfolio Management": ["ira", "janu"],
     }
 
     ANALYST_MAPPING = dict(ANALYST_KEY_TO_ID)
@@ -89,10 +89,10 @@ class MessageBuffer:
             if analyst_key in self.ANALYST_MAPPING:
                 self.agent_status[self.ANALYST_MAPPING[analyst_key]] = "pending"
 
-        # Add fixed teams
+        # Add fixed teams (Janu is on-demand only in the web UI; keep standby in CLI progress)
         for team_agents in self.FIXED_AGENTS.values():
             for agent in team_agents:
-                self.agent_status[agent] = "pending"
+                self.agent_status[agent] = "standby" if agent == "janu" else "pending"
 
         # Build report_sections dynamically
         self.report_sections = {}
@@ -277,7 +277,7 @@ def update_display(layout, spinner_text=None, stats_handler=None, start_time=Non
         "Research Team": ["ayan", "kiran", "tara"],
         "Trading Team": ["zian"],
         "Risk Management": ["veer", "shan", "rey"],
-        "Portfolio Management": ["ira"],
+        "Portfolio Management": ["ira", "janu"],
     }
 
     # Filter teams to only include agents that are in agent_status

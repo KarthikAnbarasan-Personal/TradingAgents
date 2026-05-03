@@ -102,6 +102,12 @@ AGENT_SPECS: Tuple[AgentSpec, ...] = (
         meaning="Earth / wealth",
         role_description="Builds and manages portfolio allocation.",
     ),
+    AgentSpec(
+        id="janu",
+        display_name="Janu (Portfolio Analyst)",
+        meaning="Spirit of synthesis / clarity",
+        role_description="On-demand consolidation: executive highlights, core thesis, and next actions from completed reports.",
+    ),
 )
 
 AGENTS_BY_ID: Final[Dict[str, AgentSpec]] = {s.id: s for s in AGENT_SPECS}
@@ -120,7 +126,7 @@ FIXED_AGENT_GROUPS: Final[Dict[str, List[str]]] = {
     "Research Team": ["ayan", "kiran", "tara"],
     "Trading Team": ["zian"],
     "Risk Management": ["veer", "shan", "rey"],
-    "Portfolio Management": ["ira"],
+    "Portfolio Management": ["ira", "janu"],
 }
 
 LEGACY_AGENT_ID: Final[Dict[str, str]] = {
@@ -136,6 +142,7 @@ LEGACY_AGENT_ID: Final[Dict[str, str]] = {
     "Neutral Analyst": "rey",
     "Conservative Analyst": "shan",
     "Portfolio Manager": "ira",
+    "Janu (Portfolio Analyst)": "janu",
 }
 
 REPORT_SECTION_KEYS: Final[Tuple[str, ...]] = (

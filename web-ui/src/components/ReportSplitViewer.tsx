@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { januConsolidateRun, januConsolidateSaved } from "../lib/api";
 import { formatSectionNavDisplayLabel, groupSectionPaths, reorderSectionGroupsForNav } from "../lib/reportSections";
 import { RunReport } from "../lib/types";
 import { ResearchPaperProse } from "./ResearchPaperProse";
@@ -26,17 +27,24 @@ function IconAgentOutputs() {
   );
 }
 
+export type JanuConsolidateTarget = { kind: "run"; runId: string } | { kind: "saved"; reportId: string };
+
 type Props = {
   report: RunReport | null;
+  /** When set, show on-demand Janu consolidation for API runs or saved `reports/` bundles. */
+  januTarget?: JanuConsolidateTarget | null;
+  onAfterJanu?: () => void | Promise<void>;
 };
 
-export function ReportSplitViewer({ report }: Props) {
+export function ReportSplitViewer({ report, januTarget = null, onAfterJanu }: Props) {
   const sectionGroups = useMemo(
     () => reorderSectionGroupsForNav(groupSectionPaths(Object.keys(report?.sections ?? {}))),
     [report?.sections]
   );
 
   const [activeKey, setActiveKey] = useState<string>(FULL_REPORT_KEY);
+  const [januBusy, setJanuBusy] = useState(false);
+  const [januError, setJanuError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!report) {
@@ -61,8 +69,42 @@ export function ReportSplitViewer({ report }: Props) {
     );
   }
 
+  async function runJanu() {
+    if (!januTarget) return;
+    setJanuError(null);
+    setJanuBusy(true);
+    try {
+      const res =
+        januTarget.kind === "run"
+          ? await januConsolidateRun(januTarget.runId)
+          : await januConsolidateSaved(januTarget.reportId);
+      await onAfterJanu?.();
+      setActiveKey(res.section_path);
+    } catch (e) {
+      setJanuError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setJanuBusy(false);
+    }
+  }
+
   return (
     <div className="card report-split-card">
+      {januTarget ? (
+        <div className="report-split-toolbar">
+          <span className="report-split-toolbar-meta">Portfolio wing · Janu (on demand)</span>
+          <div className="report-split-toolbar-actions">
+            {januError ? <span className="report-split-toolbar-error">{januError}</span> : null}
+            <button
+              type="button"
+              className="secondary"
+              disabled={januBusy || !report.complete_report_markdown?.trim()}
+              onClick={() => void runJanu()}
+            >
+              {januBusy ? "Janu is consolidating…" : "Consolidate with Janu"}
+            </button>
+          </div>
+        </div>
+      ) : null}
       <div className="report-split">
         <nav className="report-split-nav" aria-label="Report sections">
           <div className="report-split-nav-title">Sections</div>

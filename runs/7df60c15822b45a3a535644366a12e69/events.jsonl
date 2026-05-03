@@ -100,3 +100,4 @@
 {"seq": 100, "type": "section_updated", "timestamp": "2026-05-03T05:59:46.672990+00:00", "data": {"section": "final_trade_decision", "chars": 1933}}
 {"seq": 101, "type": "stats_updated", "timestamp": "2026-05-03T05:59:46.677538+00:00", "data": {"llm_calls": 17, "tool_calls": 16, "tokens_in": 82230, "tokens_out": 15902}}
 {"seq": 102, "type": "run_completed", "timestamp": "2026-05-03T05:59:46.773407+00:00", "data": {"run_id": "7df60c15822b45a3a535644366a12e69", "decision": "Hold", "complete_report_path": "C:\\Users\\karth\\Projects\\Projects\\TradingAgents\\runs\\7df60c15822b45a3a535644366a12e69\\reports\\complete_report.md"}}
+{"seq": 1, "type": "janu_consolidation_complete", "timestamp": "2026-05-03T12:20:33.816347+00:00", "data": {"path": "5_portfolio/janu_consolidation.md", "chars": 5255}}

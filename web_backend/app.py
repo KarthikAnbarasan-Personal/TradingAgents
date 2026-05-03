@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from web_backend.events import to_sse
 from web_backend.options import build_frontend_options
+from web_backend.janu_service import execute_janu_for_run, execute_janu_for_saved_report
 from web_backend.run_manager import RunManager
 from web_backend.runner import start_run_thread
 from web_backend.schemas import RunCreateRequest, RunEvent
@@ -270,4 +271,30 @@ def get_saved_report(report_id: str) -> JSONResponse:
         return JSONResponse(content=json.loads(json.dumps(payload, ensure_ascii=False)))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Saved report is incomplete")
+
+
+@app.post("/api/runs/{run_id}/portfolio/janu-consolidate")
+def janu_consolidate_run(run_id: str) -> dict:
+    """On-demand Janu synthesis for a completed API run (writes `5_portfolio/janu_consolidation.md`)."""
+    if run_manager.get_run(run_id) is None:
+        raise HTTPException(status_code=404, detail="Run not found")
+    try:
+        markdown, rel = execute_janu_for_run(run_manager, run_id)
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e) or "Not found") from e
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    return {"markdown": markdown, "section_path": rel, "run_id": run_id}
+
+
+@app.post("/api/reports/{report_id}/portfolio/janu-consolidate")
+def janu_consolidate_saved(report_id: str) -> dict:
+    """On-demand Janu for a saved report folder under `reports/`."""
+    try:
+        markdown, rel = execute_janu_for_saved_report(report_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e) or "Not found") from e
+    return {"markdown": markdown, "section_path": rel, "report_id": report_id}
 
