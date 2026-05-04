@@ -10,14 +10,15 @@ from typing import Iterator
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 
 from web_backend.events import to_sse
 from web_backend.options import build_frontend_options
 from web_backend.janu_service import execute_janu_for_run, execute_janu_for_saved_report
 from web_backend.run_manager import RunManager
 from web_backend.runner import start_run_thread
-from web_backend.schemas import RunCreateRequest, RunEvent
+from web_backend.pdf_export import markdown_to_pdf_bytes, safe_pdf_filename
+from web_backend.schemas import ExportReportPdfRequest, RunCreateRequest, RunEvent
 
 
 load_dotenv()
@@ -40,6 +41,26 @@ run_manager = RunManager(RUNS_DIR)
 @app.get("/api/health")
 def health() -> dict:
     return {"ok": True}
+
+
+@app.post("/api/export-report-pdf")
+def export_report_pdf(body: ExportReportPdfRequest) -> Response:
+    """Render Markdown to PDF in the API process (reliable offline export; text-based PDF)."""
+    title = (body.title or "Report").strip() or "Report"
+    try:
+        pdf_bytes = markdown_to_pdf_bytes(body.markdown, title)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    stem = (body.filename_stem or title).strip() or "report"
+    fname = safe_pdf_filename(stem)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+    )
 
 
 @app.get("/api/options")

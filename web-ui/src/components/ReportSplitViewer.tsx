@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { januConsolidateRun, januConsolidateSaved } from "../lib/api";
+import { downloadReportPdf, januConsolidateRun, januConsolidateSaved } from "../lib/api";
 import { formatSectionNavDisplayLabel, groupSectionPaths, reorderSectionGroupsForNav } from "../lib/reportSections";
 import { RunReport } from "../lib/types";
 import { ResearchPaperProse } from "./ResearchPaperProse";
@@ -34,9 +34,10 @@ type Props = {
   /** When set, show on-demand Janu consolidation for API runs or saved `reports/` bundles. */
   januTarget?: JanuConsolidateTarget | null;
   onAfterJanu?: () => void | Promise<void>;
+  onPdfExportError?: (message: string) => void;
 };
 
-export function ReportSplitViewer({ report, januTarget = null, onAfterJanu }: Props) {
+export function ReportSplitViewer({ report, januTarget = null, onAfterJanu, onPdfExportError }: Props) {
   const sectionGroups = useMemo(
     () => reorderSectionGroupsForNav(groupSectionPaths(Object.keys(report?.sections ?? {}))),
     [report?.sections]
@@ -45,6 +46,7 @@ export function ReportSplitViewer({ report, januTarget = null, onAfterJanu }: Pr
   const [activeKey, setActiveKey] = useState<string>(FULL_REPORT_KEY);
   const [januBusy, setJanuBusy] = useState(false);
   const [januError, setJanuError] = useState<string | null>(null);
+  const [pdfBusy, setPdfBusy] = useState(false);
 
   useEffect(() => {
     if (!report) {
@@ -87,13 +89,42 @@ export function ReportSplitViewer({ report, januTarget = null, onAfterJanu }: Pr
     }
   }
 
+  async function handleExportPdf() {
+    if (!report || !activeMarkdown.trim()) return;
+    const sectionSlug =
+      activeKey === FULL_REPORT_KEY ? "complete" : activeKey.replace(/[/\\:*?"<>|]+/g, "_").replace(/\s+/g, "_");
+    const titleBase = report.title?.trim() || report.run_id || "report";
+    const pdfTitle =
+      activeKey === FULL_REPORT_KEY ? titleBase : `${titleBase} · ${formatSectionNavDisplayLabel(activeKey)}`;
+    const stem = `${titleBase}_${sectionSlug}`;
+    setPdfBusy(true);
+    try {
+      await downloadReportPdf(activeMarkdown, pdfTitle, stem);
+    } catch (err) {
+      onPdfExportError?.(err instanceof Error ? err.message : String(err));
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
   return (
     <div className="card report-split-card">
-      {januTarget ? (
-        <div className="report-split-toolbar">
-          <span className="report-split-toolbar-meta">Portfolio wing · Janu (on demand)</span>
-          <div className="report-split-toolbar-actions">
-            {januError ? <span className="report-split-toolbar-error">{januError}</span> : null}
+      <div className="report-split-toolbar">
+        <span className="report-split-toolbar-meta">
+          {januTarget ? "Portfolio wing · Janu (on demand)" : "Report · PDF export uses the section shown below"}
+        </span>
+        <div className="report-split-toolbar-actions">
+          {januTarget && januError ? <span className="report-split-toolbar-error">{januError}</span> : null}
+          <button
+            type="button"
+            className="secondary"
+            disabled={pdfBusy || !activeMarkdown.trim()}
+            title="Download the current section (or complete report) as a PDF from Markdown on the API"
+            onClick={() => void handleExportPdf()}
+          >
+            {pdfBusy ? "Preparing PDF…" : "Export PDF"}
+          </button>
+          {januTarget ? (
             <button
               type="button"
               className="secondary"
@@ -102,9 +133,9 @@ export function ReportSplitViewer({ report, januTarget = null, onAfterJanu }: Pr
             >
               {januBusy ? "Janu is consolidating…" : "Consolidate with Janu"}
             </button>
-          </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
       <div className="report-split">
         <nav className="report-split-nav" aria-label="Report sections">
           <div className="report-split-nav-title">Sections</div>

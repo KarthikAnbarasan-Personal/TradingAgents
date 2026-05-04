@@ -149,6 +149,7 @@ export function HistoryPageClient() {
         <div className="dashboard-right-body">
           <ReportSplitViewer
             report={report}
+            onPdfExportError={(msg) => setError(msg)}
             januTarget={
               selectedRunId
                 ? { kind: "run", runId: selectedRunId }

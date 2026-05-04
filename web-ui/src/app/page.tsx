@@ -184,6 +184,7 @@ export default function HomePage() {
           )}
           <ReportViewer
             report={report}
+            onPdfExportError={(msg) => setError(msg)}
             headerActions={
               <button
                 type="button"

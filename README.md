@@ -221,6 +221,7 @@ Core local API endpoints:
 - `GET /api/runs/{id}/report` final report payload
 - `GET /api/reports` list historical reports from `reports/`
 - `GET /api/reports/{report_id}` read a saved report bundle
+- `POST /api/export-report-pdf` body `{ markdown, title?, filename_stem? }` → `application/pdf` download (Markdown → PDF on the server)
 
 ## TradingAgents Package
 

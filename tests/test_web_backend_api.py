@@ -36,3 +36,14 @@ def test_create_list_cancel_run(tmp_path, monkeypatch):
     assert fetched.status_code == 200
     assert fetched.json()["status"] == "cancel_requested"
 
+
+def test_export_report_pdf():
+    client = TestClient(backend_app.app)
+    res = client.post(
+        "/api/export-report-pdf",
+        json={"markdown": "# Hello\n\n**Bold** text.", "title": "Unit test", "filename_stem": "ut_export"},
+    )
+    assert res.status_code == 200
+    assert "application/pdf" in res.headers.get("content-type", "")
+    assert res.content[:4] == b"%PDF"
+

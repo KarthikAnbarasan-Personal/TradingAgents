@@ -46,6 +46,14 @@ class RunEvent(BaseModel):
     data: Dict[str, Any] = Field(default_factory=dict)
 
 
+class ExportReportPdfRequest(BaseModel):
+    """Server-side Markdown → PDF (avoids browser canvas / CORS / image 404 issues)."""
+
+    markdown: str = Field(..., max_length=2_500_000)
+    title: Optional[str] = Field(None, max_length=500)
+    filename_stem: Optional[str] = Field(None, max_length=200)
+
+
 class RunSnapshot(BaseModel):
     run_id: str
     status: RunStatus
